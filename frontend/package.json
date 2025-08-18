@@ -45,5 +45,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "ajv": "^6.12.6",
+    "ajv-keywords": "^3.5.2"
+  }
 }
