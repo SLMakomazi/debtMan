@@ -2,12 +2,13 @@ require('dotenv').config();
 
 module.exports = {
   development: {
-    username: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || 'postgres',
-    database: process.env.DB_NAME || 'debtmanager_dev',
-    host: process.env.DB_HOST || '127.0.0.1',
+    username: 'postgres',
+    password: 'admin',  // The password you used to connect
+    database: 'debt_manager',
+    host: 'localhost',
+    port: 5432,
     dialect: 'postgres',
-    logging: false,
+    logging: console.log,  // Enable query logging for debugging
   },
   test: {
     username: 'root',

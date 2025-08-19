@@ -12,20 +12,27 @@
     "seed": "npx sequelize-cli db:seed:all",
     "seed:undo": "npx sequelize-cli db:seed:undo:all"
   },
-  "keywords": ["debt", "manager", "finance", "node", "express", "postgresql"],
+  "keywords": [
+    "debt",
+    "manager",
+    "finance",
+    "node",
+    "express",
+    "postgresql"
+  ],
   "author": "Your Name",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "dotenv": "^16.0.3",
+    "dotenv": "^16.6.1",
     "express": "^4.18.2",
     "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.0",
     "morgan": "^1.10.0",
-    "pg": "^8.10.0",
+    "pg": "^8.16.3",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.31.0"
+    "sequelize": "^6.37.7"
   },
   "devDependencies": {
     "nodemon": "^2.0.22",
