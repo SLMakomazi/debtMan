@@ -1,13 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import Loader from '../../components/Loader/Loader';
+import { FiRefreshCw } from 'react-icons/fi';
+import api from '../../services/api';
 import './Payments.css';
 
 const Payments = () => {
   useAuth(); // Authentication context is available if needed
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all');
   const [stats, setStats] = useState({
     totalPaid: 0,
@@ -15,110 +19,85 @@ const Payments = () => {
     upcomingPayments: 0
   });
 
-  useEffect(() => {
-    const fetchPayments = async () => {
-      try {
-        setLoading(true);
-        // In a real app, this would be an API call to fetch payments
-        // const response = await api.get('/payments');
-        // setPayments(response.data);
-        
-        // Mock data for now
-        const mockPayments = [
-          {
-            id: 1,
-            amount: 125.00,
-            status: 'completed',
-            date: '2023-08-15T10:30:00Z',
-            creditorName: 'Chase Credit Card',
-            paymentMethod: '•••• 4532',
-            reference: 'PAY-789012'
-          },
-          {
-            id: 2,
-            amount: 89.99,
-            status: 'scheduled',
-            date: '2023-08-20T00:00:00Z',
-            creditorName: 'Student Loan',
-            paymentMethod: 'Bank Account',
-            reference: 'PAY-789013'
-          },
-          {
-            id: 3,
-            amount: 45.50,
-            status: 'failed',
-            date: '2023-08-10T14:15:00Z',
-            creditorName: 'Utility Bill',
-            paymentMethod: '•••• 9821',
-            reference: 'PAY-789014',
-            failureReason: 'Insufficient funds'
-          },
-          {
-            id: 4,
-            amount: 210.00,
-            status: 'completed',
-            date: '2023-07-30T09:45:00Z',
-            creditorName: 'Auto Loan',
-            paymentMethod: 'Bank Account',
-            reference: 'PAY-789015'
-          },
-          {
-            id: 5,
-            amount: 75.00,
-            status: 'scheduled',
-            date: '2023-09-01T00:00:00Z',
-            creditorName: 'Credit One',
-            paymentMethod: '•••• 1234',
-            reference: 'PAY-789016'
-          }
-        ];
-        
-        setPayments(mockPayments);
-        
-        // Calculate stats
-        const completedPayments = mockPayments.filter(p => p.status === 'completed');
-        const totalPaid = completedPayments.reduce((sum, payment) => sum + payment.amount, 0);
-        const upcomingPayments = mockPayments.filter(p => p.status === 'scheduled').length;
-        
-        setStats({
-          totalPaid,
-          paymentsCount: completedPayments.length,
-          upcomingPayments
-        });
-      } catch (error) {
-        console.error('Error fetching payments:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchData = useCallback(async () => {
+    const isRefreshing = refreshing;
+    try {
+      if (!isRefreshing) setLoading(true);
+      setError(null);
+      
+      // Fetch payments and stats in parallel
+      const [paymentsRes, statsRes] = await Promise.all([
+        api.get('/payments'),
+        api.get('/payments/stats')
+      ]);
+      
+      setPayments(paymentsRes.data || []);
+      setStats({
+        totalPaid: parseFloat(statsRes.data?.totalPaid) || 0,
+        paymentsCount: parseInt(statsRes.data?.paymentsCount) || 0,
+        upcomingPayments: parseInt(statsRes.data?.upcomingPayments) || 0
+      });
+    } catch (error) {
+      console.error('Error fetching payments:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to load payment data. Please try again later.';
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+      if (isRefreshing) setRefreshing(false);
+    }
+  }, [refreshing]);
 
-    fetchPayments();
-  }, []);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchData();
+  };
 
   const filteredPayments = filter === 'all' 
     ? payments 
     : payments.filter(payment => payment.status === filter);
+    
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(amount);
+  };
 
   const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    
     const options = { 
       year: 'numeric', 
       month: 'short', 
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      hour12: true
     };
-    return new Date(dateString).toLocaleDateString('en-US', options);
+    
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', options);
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'Invalid date';
+    }
   };
 
   const getStatusBadge = (status) => {
     const statusMap = {
-      completed: { text: 'Completed', class: 'status-completed' },
-      scheduled: { text: 'Scheduled', class: 'status-scheduled' },
-      failed: { text: 'Failed', class: 'status-failed' },
-      pending: { text: 'Pending', class: 'status-pending' }
+      completed: { text: 'Completed', class: 'completed' },
+      scheduled: { text: 'Scheduled', class: 'scheduled' },
+      failed: { text: 'Failed', class: 'failed' },
+      pending: { text: 'Pending', class: 'pending' }
     };
     
-    const statusInfo = statusMap[status] || { text: status, class: 'status-default' };
+    const statusInfo = statusMap[status.toLowerCase()] || { text: status, class: 'default' };
     
     return (
       <span className={`status-badge ${statusInfo.class}`}>
@@ -127,17 +106,42 @@ const Payments = () => {
     );
   };
 
-  if (loading) {
+  if (loading && !refreshing) {
     return <Loader fullPage message="Loading your payments..." />;
+  }
+  
+  if (error && !refreshing) {
+    return (
+      <div className="error-message">
+        <p>{error}</p>
+        <button onClick={handleRefresh} className="btn btn-text" disabled={refreshing}>
+          {refreshing ? 'Retrying...' : 'Retry'}
+        </button>
+      </div>
+    );
   }
 
   return (
     <div className="payments-page">
       <div className="page-header">
-        <h1>Payments</h1>
-        <Link to="/payments/new" className="btn btn-primary">
-          + New Payment
-        </Link>
+        <div>
+          <h1>Payments</h1>
+          <p className="page-subtitle">View and manage your payment history</p>
+        </div>
+        <div className="header-actions">
+          <button 
+            onClick={handleRefresh} 
+            className="btn btn-icon"
+            disabled={loading || refreshing}
+            title="Refresh data"
+          >
+            <FiRefreshCw className={refreshing ? 'spinning' : ''} />
+            {refreshing ? 'Refreshing...' : 'Refresh'}
+          </button>
+          <Link to="/payments/new" className="btn btn-primary">
+            + New Payment
+          </Link>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -215,10 +219,11 @@ const Payments = () => {
               <div className="table-row">
                 <div className="table-cell">Date & Time</div>
                 <div className="table-cell">Description</div>
-                <div className="table-cell">Amount</div>
-                <div className="table-cell">Status</div>
-                <div className="table-cell">Reference</div>
-                <div className="table-cell">Actions</div>
+                <div className="payment-amount"></div>
+                <div className="payment-details">
+                  <div className="payment-creditor"></div>
+                  <div className="payment-date"></div>
+                </div>
               </div>
             </div>
             <div className="table-body">
@@ -228,13 +233,14 @@ const Payments = () => {
                     {formatDate(payment.date)}
                   </div>
                   <div className="table-cell" data-label="Description">
-                    <div className="payment-description">
-                      <div className="payment-creditor">{payment.creditorName}</div>
-                      <div className="payment-method">{payment.paymentMethod}</div>
+                    <div className={`payment-status ${payment.status}`}>
+                      {getStatusBadge(payment.status)}
                     </div>
+                    <div className="payment-creditor">{payment.creditorName}</div>
+                    <div className="payment-method">{payment.paymentMethod}</div>
                   </div>
                   <div className="table-cell amount" data-label="Amount">
-                    ${payment.amount.toFixed(2)}
+                    {formatCurrency(payment.amount)}
                   </div>
                   <div className="table-cell" data-label="Status">
                     {getStatusBadge(payment.status)}
