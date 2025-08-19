@@ -1,0 +1,48 @@
+services:
+  - type: web
+    name: debt-manager-backend
+    env: node
+    build:
+      buildCommand: npm install && npm run build
+      startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        value: https://your-frontend-url.com
+    plan: free
+
+  - type: postgres
+    name: debt-manager-db
+    plan: free
+    disk:
+      name: debt-manager-db-disk
+      sizeGB: 1
+    databases:
+      - name: debtmanager_prod
+        databaseName: debtmanager_prod
+        user: debtmanager_user
+    ipAllowList:
+      - ip: 0.0.0.0/0
+        description: Allow all IPs (restrict in production)
+
+# Add a job to run database migrations
+jobs:
+  - type: shell
+    name: run-migrations
+    service: debt-manager-backend
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: debt-manager-db
+          property: connectionString
+    commands:
+      - npx sequelize-cli db:migrate
+    trigger: on-deploy
