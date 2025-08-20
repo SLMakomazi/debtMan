@@ -106,3 +106,7 @@
 [31m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
 2025-08-20 09:49:49 [32minfo[39m: 	[32mServer running in development mode on port 5000[39m
 2025-08-20 09:49:49 [32minfo[39m: 	[32m✅ Database connection established successfully[39m
+2025-08-20 10:00:31 [32minfo[39m: 	[32mServer running in development mode on port 5000[39m
+2025-08-20 10:00:32 [32minfo[39m: 	[32m✅ Database connection established successfully[39m
+2025-08-20 10:06:04 [32minfo[39m: 	[32mServer running in development mode on port 5000[39m
+2025-08-20 10:06:05 [32minfo[39m: 	[32m✅ Database connection established successfully[39m

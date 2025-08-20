@@ -31,11 +31,19 @@ const Payments = () => {
         api.get('/payments/stats')
       ]);
       
-      setPayments(paymentsRes.data || []);
+      // Handle different possible response structures
+      const paymentsData = Array.isArray(paymentsRes.data) 
+        ? paymentsRes.data 
+        : paymentsRes.data?.data || paymentsRes.data?.payments || [];
+      
+      setPayments(paymentsData);
+      
+      // Handle stats response
+      const statsData = statsRes.data?.data || statsRes.data || {};
       setStats({
-        totalPaid: parseFloat(statsRes.data?.totalPaid) || 0,
-        paymentsCount: parseInt(statsRes.data?.paymentsCount) || 0,
-        upcomingPayments: parseInt(statsRes.data?.upcomingPayments) || 0
+        totalPaid: parseFloat(statsData.totalPaid) || 0,
+        paymentsCount: parseInt(statsData.paymentsCount) || 0,
+        upcomingPayments: parseInt(statsData.upcomingPayments) || 0
       });
     } catch (error) {
       console.error('Error fetching payments:', error);
@@ -56,9 +64,12 @@ const Payments = () => {
     fetchData();
   };
 
+  // Ensure we always have an array, even if payments is null/undefined
+  const paymentsArray = Array.isArray(payments) ? payments : [];
+  
   const filteredPayments = filter === 'all' 
-    ? payments 
-    : payments.filter(payment => payment.status === filter);
+    ? paymentsArray 
+    : paymentsArray.filter(payment => payment.status === filter);
     
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
