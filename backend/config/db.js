@@ -18,6 +18,20 @@ const pool = mysql.createPool({
 // Test the database connection
 const testConnection = async () => {
   try {
+    // Log database configuration (without sensitive data)
+    const dbConfig = {
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT || 3306,
+      database: process.env.DB_NAME,
+      user: process.env.DB_USER,
+      ssl: false,
+      environment: process.env.NODE_ENV || 'development'
+    };
+    console.log('🔌 Database Configuration:', dbConfig);
+
+    // Log database connection attempt
+    console.log('🔍 Attempting to connect to database...');
+
     const connection = await pool.getConnection();
     console.log('✅ Database connection established successfully');
     connection.release();

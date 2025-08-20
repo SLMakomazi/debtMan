@@ -18,6 +18,12 @@ const app = express();
 // Set security HTTP headers
 app.use(helmet());
 
+// Enhanced request logging
+app.use((req, res, next) => {
+  console.log(`🌐 [${new Date().toISOString()}] ${req.method} ${req.originalUrl} from ${req.headers.origin || 'unknown origin'}`);
+  next();
+});
+
 // Development logging
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
@@ -39,18 +45,23 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: function (origin, callback) {
+    console.log(`🌍 CORS check for origin: ${origin || 'no origin'}`);
+    
     // Allow all origins in development
     if (process.env.NODE_ENV !== 'production') {
+      console.log('   ✅ Development mode - allowing all origins');
       return callback(null, true);
     }
     
     // In production, only allow specific origins
     if (allowedOrigins.includes(origin) || !origin) {
+      console.log(`   ✅ Allowed origin: ${origin || 'no origin (server-side request)'}`);
       return callback(null, true);
     }
     
     const msg = `CORS policy: ${origin} not allowed`;
-    console.warn(msg);
+    console.warn(`   ❌ ${msg}`);
+    console.log('   Allowed origins:', allowedOrigins);
     return callback(new Error(msg), false);
   },
   credentials: true,
@@ -58,7 +69,9 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   exposedHeaders: ['Content-Length'],
   optionsSuccessStatus: 200,
-  maxAge: 86400 // 24 hours
+  maxAge: 86400, // 24 hours
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
 
 // Enable CORS
@@ -108,14 +121,35 @@ app.use(errorHandler);
 // Start server
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, async () => {
-  logger.info(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+  console.log('\n🚀 Server startup sequence initiated');
+  console.log('================================');
+  console.log(`🌐 Server running in ${process.env.NODE_ENV || 'development'} mode`);
+  console.log(`🔊 Listening on port ${PORT}`);
+  console.log(`🔄 Frontend URL: ${process.env.FRONTEND_URL || 'Not set'}`);
+  console.log('--------------------------------');
   
   // Test database connection
+  console.log('🔍 Testing database connection...');
   const dbConnected = await testConnection();
+  
   if (dbConnected) {
-    logger.info('✅ Database connection established successfully');
+    console.log('✅ Database connection established successfully');
+    console.log('--------------------------------');
+    console.log('🔗 Connection Flow:');
+    console.log('1. Frontend (Browser) → Backend (Node.js) ✅');
+    console.log('2. Backend → Database (MySQL) ✅');
+    console.log('--------------------------------');
+    console.log('🚀 Server is fully operational and ready to handle requests!');
+    console.log('================================\n');
   } else {
-    logger.error('❌ Failed to connect to database');
+    console.error('❌ Failed to connect to database');
+    console.log('--------------------------------');
+    console.log('🔴 Connection Flow:');
+    console.log('1. Frontend (Browser) → Backend (Node.js) ✅');
+    console.log('2. Backend → Database (MySQL) ❌ FAILED');
+    console.log('--------------------------------');
+    console.error('❌ Server started but cannot connect to database!');
+    console.log('================================\n');
   }
 });
 
