@@ -20,8 +20,8 @@ app.use(helmet());
 
 // Configure CORS
 const allowedOrigins = [
-  'https://debt-man.vercel.app',
-  'http://localhost:3000'
+  "http://localhost:3000",
+  "https://debt-man.vercel.app"
 ];
 
 const corsOptions = {
