@@ -1,12 +1,16 @@
 import axios from 'axios';
 
 // Create axios instance with correct base URL
-const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const baseURL = process.env.NODE_ENV === 'production' 
+  ? 'https://debtman.onrender.com' 
+  : process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
 const api = axios.create({
   baseURL: `${baseURL}/api/v1`,
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // Important for sending cookies with requests
 });
 
 console.log('API Base URL:', api.defaults.baseURL);

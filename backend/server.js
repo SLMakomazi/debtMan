@@ -18,18 +18,6 @@ const app = express();
 // Set security HTTP headers
 app.use(helmet());
 
-// Configure CORS
-const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL 
-    : 'http://localhost:3000',
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  optionsSuccessStatus: 200
-};
-app.use(cors(corsOptions));
-
 // Development logging
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
@@ -42,16 +30,42 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 // Serving static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Enable CORS
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+// Configure CORS
+const allowedOrigins = [
+  'https://debt-man.vercel.app',
+  'http://localhost:3000',
+  'http://localhost:5000'
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow all origins in development
+    if (process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+    
+    // In production, only allow specific origins
+    if (allowedOrigins.includes(origin) || !origin) {
+      return callback(null, true);
+    }
+    
+    const msg = `CORS policy: ${origin} not allowed`;
+    console.warn(msg);
+    return callback(new Error(msg), false);
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Length'],
+  optionsSuccessStatus: 200,
+  maxAge: 86400 // 24 hours
+};
+
+// Enable CORS
+app.use(cors(corsOptions));
 
 // Enable pre-flight across-the-board
-app.options('*', cors());
+app.options('*', cors(corsOptions));
 
 // Compress all responses
 app.use(compression());
