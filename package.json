@@ -8,13 +8,22 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "install:frontend": "cd frontend && npm install --unsafe-perm",
+    "start:frontend": "cd frontend && npm start",
     "build:frontend": "cd frontend && npm run build",
     "install:backend": "cd backend && npm install",
+    "start:backend": "cd backend && npm run dev",
     "build:backend": "cd backend && npm run build",
+    "migrate": "cd backend && npm run migrate",
+    "seed": "cd backend && npm run seed",
     "install:all": "npm run install:frontend && npm run install:backend",
     "build": "npm run build:frontend && npm run build:backend",
-    "start": "cd backend && npm start",
-    "vercel-build": "npm install --unsafe-perm && cd frontend && npm install --unsafe-perm && npm run build"
+    "start": "npm-run-all --parallel start:backend start:frontend",
+    "start:prod": "cd backend && npm start",
+    "vercel-build": "npm install --unsafe-perm && cd frontend && npm install --unsafe-perm && npm run build",
+    "dev": "npm-run-all --parallel start:backend start:frontend"
+  },
+  "dependencies": {
+    "mysql2": "^3.14.3"
   },
   "engines": {
     "node": ">=18.x"
@@ -23,7 +32,7 @@
   "author": "",
   "license": "ISC",
   "description": "Debt Manager Application",
-  "dependencies": {
-    "mysql2": "^3.14.3"
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
   }
 }

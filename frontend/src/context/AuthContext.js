@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import api from '../services/api';
+import api from '../utils/api';
 
 export const AuthContext = createContext();
 
@@ -10,29 +10,49 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // Initialize user from localStorage and verify token
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-      api.defaults.headers.Authorization = `Bearer ${JSON.parse(storedUser).token}`;
-    }
-    setLoading(false);
+    const initializeAuth = async () => {
+      try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const userData = JSON.parse(storedUser);
+          // Verify token by hitting /auth/me
+          await api.get('/auth/me');
+          setUser(userData);
+        }
+      } catch (error) {
+        // Clear invalid token
+        localStorage.removeItem('user');
+        delete api.defaults.headers.Authorization;
+      } finally {
+        setLoading(false);
+      }
+    };
+    initializeAuth();
   }, []);
 
   const login = async (email, password) => {
     try {
+      setLoading(true);
+      // Correct endpoint: /auth/login
       const response = await api.post('/auth/login', { email, password });
       const { user, token } = response.data;
-      
-      localStorage.setItem('user', JSON.stringify({ ...user, token }));
+
+      const userData = { ...user, token };
+      localStorage.setItem('user', JSON.stringify(userData));
       api.defaults.headers.Authorization = `Bearer ${token}`;
-      setUser({ ...user, token });
-      
+      setUser(userData);
+
       toast.success('Login successful!');
       return true;
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Login failed');
+      toast.error(
+        error.response?.data?.message || 'Login failed. Please check your credentials.'
+      );
       return false;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -40,6 +60,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('user');
     delete api.defaults.headers.Authorization;
     setUser(null);
+    toast.success('Logged out successfully.');
     navigate('/login');
   };
 
@@ -50,6 +71,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => {
-  return React.useContext(AuthContext);
-};
+export const useAuth = () => React.useContext(AuthContext);

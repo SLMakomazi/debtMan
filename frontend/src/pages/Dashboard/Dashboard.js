@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Loader from '../../components/Loader/Loader';
-import api from '../../services/api';
+import api from '../../utils/api';
 import './Dashboard.css';
 
 const Dashboard = () => {

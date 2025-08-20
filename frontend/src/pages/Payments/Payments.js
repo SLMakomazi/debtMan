@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import Loader from '../../components/Loader/Loader';
 import { FiRefreshCw } from 'react-icons/fi';
-import api from '../../services/api';
+import api from '../../utils/api';
 import './Payments.css';
 
 const Payments = () => {
