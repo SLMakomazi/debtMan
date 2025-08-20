@@ -6,17 +6,20 @@ import 'react-toastify/dist/ReactToastify.css';
 import App from './App';
 import './index.css';
 
-const router = createBrowserRouter([{ path: '*', element: <App /> }], {
-  future: {
-    v7_startTransition: true,
-    v7_relativeSplatPath: true,
-  },
-});
+const router = createBrowserRouter(
+  [{ path: '*', element: <App /> }],
+  {
+    future: {
+      v7_startTransition: true,
+      v7_relativeSplatPath: true,
+    },
+  }
+);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} future={{ v7_startTransition: true }} />
+    <RouterProvider router={router} />
     <ToastContainer position="top-right" autoClose={5000} />
   </React.StrictMode>
 );
