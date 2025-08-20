@@ -4,6 +4,7 @@ const userRoutes = require('./user.routes');
 const creditRoutes = require('./credit.routes');
 const accountRoutes = require('./account.routes');
 const dashboardRoutes = require('./dashboard.routes');
+const paymentRoutes = require('./payment.routes');
 
 const router = express.Router();
 
@@ -23,6 +24,7 @@ router.use('/users', userRoutes);
 router.use('/credit', creditRoutes);
 router.use('/accounts', accountRoutes);
 router.use('/dashboard', dashboardRoutes);
+router.use('/payments', paymentRoutes);
 
 // Handle 404
 router.all('*', (req, res, next) => {
