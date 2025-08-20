@@ -9,6 +9,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
   
   const { login } = useAuth();
@@ -16,6 +17,15 @@ const Login = () => {
   const location = useLocation();
   
   const from = location.state?.from?.pathname || '/';
+  
+  // Check for success message from registration
+  React.useEffect(() => {
+    if (location.state?.message) {
+      setSuccessMessage(location.state.message);
+      // Clear the location state to prevent showing the message again on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,6 +65,12 @@ const Login = () => {
           <h2>Welcome Back</h2>
           <p>Sign in to manage your debts and payments</p>
         </div>
+        
+        {successMessage && (
+          <div className="alert alert-success">
+            {successMessage}
+          </div>
+        )}
         
         {error && (
           <div className="alert alert-error">

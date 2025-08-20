@@ -32,6 +32,28 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
+  const register = async (userData) => {
+    try {
+      setLoading(true);
+      const response = await api.post('/auth/signup', userData);
+      const { user, token } = response.data;
+
+      const userDataWithToken = { ...user, token };
+      localStorage.setItem('user', JSON.stringify(userDataWithToken));
+      api.defaults.headers.Authorization = `Bearer ${token}`;
+      setUser(userDataWithToken);
+
+      toast.success('Registration successful!');
+      return true;
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Registration failed. Please try again.';
+      toast.error(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const login = async (email, password) => {
     try {
       setLoading(true);
@@ -65,7 +87,16 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        register,
+        login,
+        logout,
+        isAuthenticated: !!user,
+      }}
+    >
       {!loading && children}
     </AuthContext.Provider>
   );

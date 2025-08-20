@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import Payments from './pages/Payments/Payments';
 import Contact from './pages/Contact/Contact';
 import Login from './pages/Login/Login';
+import Register from './pages/Register';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import './App.css';
 
@@ -21,6 +22,7 @@ function AppRoutes() {
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route
             path="/dashboard"
             element={
