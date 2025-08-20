@@ -46,3 +46,35 @@
 2025-08-20 08:20:40 [31merror[39m: 	[31m[2025-08-20T06:20:40.235Z] 401 - Incorrect email or password - /api/v1/auth/login - POST - ::1[39m
 2025-08-20 08:20:40 [31merror[39m: 	[31mError: Incorrect email or password[39m
 [31m    at exports.login (C:\Users\Wipro\CascadeProjects\debtMan\backend\controllers\auth.controller.js:98:19)[39m
+2025-08-20 09:36:35 [31merror[39m: 	[31m[2025-08-20T07:36:35.879Z] 500 - Error fetching dashboard data - /api/v1/dashboard - GET - ::1[39m
+2025-08-20 09:36:35 [31merror[39m: 	[31mError: Error fetching dashboard data[39m
+[31m    at exports.getDashboardStats (C:\Users\Wipro\CascadeProjects\debtMan\backend\controllers\dashboard.controller.js:98:10)[39m
+[31m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+2025-08-20 09:36:35 [31merror[39m: 	[31m[2025-08-20T07:36:35.954Z] 500 - Error fetching dashboard data - /api/v1/dashboard - GET - ::1[39m
+2025-08-20 09:36:35 [31merror[39m: 	[31mError: Error fetching dashboard data[39m
+[31m    at exports.getDashboardStats (C:\Users\Wipro\CascadeProjects\debtMan\backend\controllers\dashboard.controller.js:98:10)[39m
+[31m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+2025-08-20 09:40:44 [31merror[39m: 	[31m[2025-08-20T07:40:44.711Z] 500 - Error fetching dashboard data - /api/v1/dashboard - GET - ::1[39m
+2025-08-20 09:40:44 [31merror[39m: 	[31mError: Error fetching dashboard data[39m
+[31m    at exports.getDashboardStats (C:\Users\Wipro\CascadeProjects\debtMan\backend\controllers\dashboard.controller.js:98:10)[39m
+[31m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+2025-08-20 09:40:44 [31merror[39m: 	[31m[2025-08-20T07:40:44.756Z] 500 - Error fetching dashboard data - /api/v1/dashboard - GET - ::1[39m
+2025-08-20 09:40:44 [31merror[39m: 	[31mError: Error fetching dashboard data[39m
+[31m    at exports.getDashboardStats (C:\Users\Wipro\CascadeProjects\debtMan\backend\controllers\dashboard.controller.js:98:10)[39m
+[31m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+2025-08-20 09:41:59 [31merror[39m: 	[31m[2025-08-20T07:41:59.204Z] 500 - Error fetching dashboard data - /api/v1/dashboard - GET - ::1[39m
+2025-08-20 09:41:59 [31merror[39m: 	[31mError: Error fetching dashboard data[39m
+[31m    at exports.getDashboardStats (C:\Users\Wipro\CascadeProjects\debtMan\backend\controllers\dashboard.controller.js:98:10)[39m
+[31m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+2025-08-20 09:41:59 [31merror[39m: 	[31m[2025-08-20T07:41:59.253Z] 500 - Error fetching dashboard data - /api/v1/dashboard - GET - ::1[39m
+2025-08-20 09:41:59 [31merror[39m: 	[31mError: Error fetching dashboard data[39m
+[31m    at exports.getDashboardStats (C:\Users\Wipro\CascadeProjects\debtMan\backend\controllers\dashboard.controller.js:98:10)[39m
+[31m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+2025-08-20 09:48:59 [31merror[39m: 	[31m[2025-08-20T07:48:59.384Z] 500 - Error fetching dashboard data - /api/v1/dashboard - GET - ::1[39m
+2025-08-20 09:48:59 [31merror[39m: 	[31mError: Error fetching dashboard data[39m
+[31m    at exports.getDashboardStats (C:\Users\Wipro\CascadeProjects\debtMan\backend\controllers\dashboard.controller.js:98:10)[39m
+[31m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+2025-08-20 09:48:59 [31merror[39m: 	[31m[2025-08-20T07:48:59.444Z] 500 - Error fetching dashboard data - /api/v1/dashboard - GET - ::1[39m
+2025-08-20 09:48:59 [31merror[39m: 	[31mError: Error fetching dashboard data[39m
+[31m    at exports.getDashboardStats (C:\Users\Wipro\CascadeProjects\debtMan\backend\controllers\dashboard.controller.js:98:10)[39m
+[31m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m

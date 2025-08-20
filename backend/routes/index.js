@@ -3,8 +3,7 @@ const authRoutes = require('./auth.routes');
 const userRoutes = require('./user.routes');
 const creditRoutes = require('./credit.routes');
 const accountRoutes = require('./account.routes');
-const { getDashboardStats } = require('../controllers/dashboard.controller');
-const { protect } = require('../middleware/auth');
+const dashboardRoutes = require('./dashboard.routes');
 
 const router = express.Router();
 
@@ -23,9 +22,7 @@ router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/credit', creditRoutes);
 router.use('/accounts', accountRoutes);
-
-// Dashboard route (protected)
-router.get('/dashboard', protect, getDashboardStats);
+router.use('/dashboard', dashboardRoutes);
 
 // Handle 404
 router.all('*', (req, res, next) => {

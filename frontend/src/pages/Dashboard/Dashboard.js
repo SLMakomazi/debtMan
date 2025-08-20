@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Loader from '../../components/Loader/Loader';
+import { formatCurrency, formatDate, formatNumber } from '../../utils/format';
 import api from '../../utils/api';
 import './Dashboard.css';
 
@@ -9,20 +10,34 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [stats, setStats] = useState({
-    totalDebts: 0,
-    paidDebts: 0,
-    pendingDebts: 0,
-    overdueDebts: 0,
-    totalAmount: 0,
-    recentPayments: []
+    // Account stats
+    totalAccounts: 0,
+    
+    // Transaction stats
+    totalTransactions: 0,
+    completedTransactions: 0,
+    pendingTransactions: 0,
+    failedTransactions: 0,
+    totalCredits: 0,
+    totalDebits: 0,
+    
+    // Payment stats
+    totalPayments: 0,
+    completedPayments: 0,
+    pendingPayments: 0,
+    failedPayments: 0,
+    totalPaid: 0,
+    
+    // Combined recent activities
+    recentActivities: []
   });
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        const response = await api.get('/dashboard');
-        setStats(response.data);
+        const { data } = await api.get('/dashboard');
+        setStats(data);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
         setError('Failed to load dashboard data');
@@ -48,54 +63,117 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      <div className="dashboard-header">
-        <h1>Welcome back, {user?.firstName || 'User'}</h1>
-        <p>Here's an overview of your financial situation</p>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="dashboard-stats">
+      <h1>Welcome back, {user?.firstName}!</h1>
+      
+      <div className="stats-grid">
+        {/* Account Stats */}
         <div className="stat-card">
-          <h3>Total Debts</h3>
-          <div className="stat-amount">{stats.totalDebts}</div>
+          <h3>Accounts</h3>
+          <p className="stat-value">{formatNumber(stats.totalAccounts)}</p>
         </div>
+        
+        {/* Transaction Stats */}
         <div className="stat-card">
+          <h3>Total Transactions</h3>
+          <p className="stat-value">{formatNumber(stats.totalTransactions)}</p>
+        </div>
+        
+        <div className="stat-card success">
+          <h3>Completed Tx</h3>
+          <p className="stat-value">{formatNumber(stats.completedTransactions)}</p>
+        </div>
+        
+        <div className="stat-card warning">
+          <h3>Pending Tx</h3>
+          <p className="stat-value">{formatNumber(stats.pendingTransactions)}</p>
+        </div>
+        
+        <div className="stat-card danger">
+          <h3>Failed Tx</h3>
+          <p className="stat-value">{formatNumber(stats.failedTransactions)}</p>
+        </div>
+        
+        {/* Payment Stats */}
+        <div className="stat-card">
+          <h3>Total Payments</h3>
+          <p className="stat-value">{formatNumber(stats.totalPayments)}</p>
+        </div>
+        
+        <div className="stat-card success">
           <h3>Paid</h3>
-          <div className="stat-amount">{stats.paidDebts}</div>
+          <p className="stat-value">{formatNumber(stats.completedPayments)}</p>
         </div>
-        <div className="stat-card">
-          <h3>Pending</h3>
-          <div className="stat-amount">{stats.pendingDebts}</div>
+        
+        <div className="stat-card warning">
+          <h3>Scheduled</h3>
+          <p className="stat-value">{formatNumber(stats.pendingPayments)}</p>
         </div>
-        <div className="stat-card">
-          <h3>Overdue</h3>
-          <div className="stat-amount">{stats.overdueDebts}</div>
+        
+        <div className="stat-card danger">
+          <h3>Failed</h3>
+          <p className="stat-value">{formatNumber(stats.failedPayments)}</p>
         </div>
+        
+        {/* Amount Stats */}
         <div className="stat-card total-amount">
-          <h3>Total Amount</h3>
-          <div className="stat-amount">${stats.totalAmount?.toFixed(2)}</div>
+          <h3>Total Credits</h3>
+          <p className="stat-value">{formatCurrency(stats.totalCredits)}</p>
+        </div>
+        
+        <div className="stat-card total-amount">
+          <h3>Total Debits</h3>
+          <p className="stat-value">{formatCurrency(stats.totalDebits)}</p>
+        </div>
+        
+        <div className="stat-card total-amount">
+          <h3>Total Paid</h3>
+          <p className="stat-value">{formatCurrency(stats.totalPaid)}</p>
         </div>
       </div>
 
-      {/* Recent Activity */}
       <div className="recent-activity">
         <h2>Recent Activity</h2>
-        {stats.recentPayments?.length > 0 ? (
+        {stats.recentActivities?.length > 0 ? (
           <div className="activity-list">
-            {stats.recentPayments.map((payment, index) => (
-              <div key={index} className="activity-item">
-                <div className="activity-details">
-                  <span className="activity-name">{payment.description || 'Payment'}</span>
-                  <span className="activity-amount">${payment.amount?.toFixed(2)}</span>
+            {stats.recentActivities.map((activity, index) => {
+              const isPayment = activity.type === 'payment';
+              const isTransaction = activity.type === 'transaction';
+              const status = activity.status?.toLowerCase();
+              const amount = isPayment ? activity.amount : activity.amount;
+              const isCredit = isTransaction ? activity.transaction_type === 'credit' : false;
+              const date = isPayment ? activity.payment_date : activity.transaction_date;
+              const description = activity.description || (isPayment ? 'Payment' : 'Transaction');
+              const institution = activity.institution || (isPayment ? 'Payment' : 'N/A');
+              
+              return (
+                <div key={`${activity.type}-${activity.id || index}`} className={`activity-item ${status}`}>
+                  <div className="activity-icon">
+                    {status === 'completed' ? '✓' : status === 'failed' ? '✗' : '⏳'}
+                  </div>
+                  <div className="activity-details">
+                    <span className="activity-name">
+                      {description} ({institution})
+                      {isPayment && (
+                        <span className="activity-badge">Payment</span>
+                      )}
+                    </span>
+                    <span className={`activity-amount ${isPayment ? 'payment' : isCredit ? 'credit' : 'debit'}`}>
+                      {isPayment ? '' : (isCredit ? '+' : '-')}
+                      {formatCurrency(amount)}
+                    </span>
+                  </div>
+                  <span className="activity-date">
+                    {date ? formatDate(date) : 'N/A'}
+                  </span>
                 </div>
-                <span className="activity-date">
-                  {payment.date ? new Date(payment.date).toLocaleDateString() : 'N/A'}
-                </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
-          <p className="no-activity">No recent activity found</p>
+          <div className="no-activity">
+            <p>No recent activity found</p>
+            <p className="subtext">Your recent transactions and payments will appear here</p>
+          </div>
         )}
       </div>
     </div>
