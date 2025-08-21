@@ -6,12 +6,18 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const path = require('path');
+const passport = require('passport');
+const session = require('express-session');
 const { testConnection } = require('./config/db');
 const { errorHandler } = require('./middleware/error');
 const logger = require('./utils/logger');
 
+// Initialize Passport
+require('./config/passport');
+
 // Import routes
 const apiRoutes = require('./routes');
+const oauthRoutes = require('./routes/oauth.routes');
 
 const app = express();
 
@@ -44,6 +50,32 @@ const corsOptions = {
   maxAge: 86400 // 24 hours
 };
 app.use(cors(corsOptions));
+
+// Session configuration (required for OAuth)
+const sessionConfig = {
+  secret: process.env.SESSION_SECRET || 'your-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+};
+
+// In production, trust the proxy and set secure cookies
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+  sessionConfig.cookie.secure = true;
+  sessionConfig.cookie.sameSite = 'none';
+}
+
+app.use(session(sessionConfig));
+
+// Initialize Passport and session
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Development logging
 if (process.env.NODE_ENV === 'development') {
@@ -81,8 +113,16 @@ const limiter = rateLimit({
 // Apply to all API routes
 app.use('/api', limiter);
 
-// API routes
+// Mount API routes
 app.use('/api/v1', apiRoutes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/debts', debtRoutes);
+app.use('/api/v1/payments', paymentRoutes);
+app.use('/api/v1/auth', oauthRoutes);
+
+// OAuth routes
+app.use('/auth', oauthRoutes);
 
 // Health check endpoint
 app.get('/health', async (req, res) => {

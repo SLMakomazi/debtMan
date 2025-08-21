@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar/Navbar';
 import Footer from './components/Footer/Footer';
@@ -9,10 +9,11 @@ import Payments from './pages/Payments/Payments';
 import Contact from './pages/Contact/Contact';
 import Login from './pages/Login/Login';
 import Register from './pages/Register';
+import CompleteRegistration from './pages/CompleteRegistration';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import './App.css';
 
-function AppRoutes() {
+const AppRoutes = () => {
   const location = useLocation();
   
   return (
@@ -23,6 +24,7 @@ function AppRoutes() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/complete-registration" element={<CompleteRegistration />} />
           <Route
             path="/dashboard"
             element={
@@ -45,14 +47,16 @@ function AppRoutes() {
       <Footer />
     </div>
   );
-}
+};
 
-function App() {
+const App = () => {
   return (
-    <AuthProvider>
-      <AppRoutes />
-    </AuthProvider>
+    <Router>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </Router>
   );
-}
+};
 
 export default App;

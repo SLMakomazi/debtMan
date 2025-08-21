@@ -3,40 +3,127 @@
   display: flex;
   min-height: 100vh;
   background-color: #f8fafc;
+  padding: 2rem 1rem;
 }
 
-/* Left Side - Login Form */
+/* Login Card */
 .login-card {
-  flex: 1;
+  width: 100%;
   max-width: 500px;
-  padding: 3rem 2rem;
+  padding: 2.5rem 2rem;
   margin: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .login-header {
   text-align: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
 }
 
 .login-header h2 {
   color: #1e293b;
-  font-size: 2rem;
+  font-size: 1.75rem;
   margin-bottom: 0.5rem;
+  font-weight: 600;
 }
 
 .login-header p {
   color: #64748b;
   font-size: 1rem;
+  margin: 0;
+}
+
+/* OAuth Buttons */
+.oauth-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.oauth-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: white;
+  color: #334155;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.oauth-btn:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.oauth-btn:active {
+  transform: translateY(0);
+}
+
+.oauth-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.oauth-btn.google {
+  border-color: #e2e8f0;
+}
+
+.oauth-btn.google:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.oauth-btn.microsoft {
+  border-color: #e2e8f0;
+}
+
+.oauth-btn.microsoft:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.oauth-icon {
+  font-size: 1.25rem;
+}
+
+/* Divider */
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.5rem 0;
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.divider span {
+  padding: 0 1rem;
+  background: white;
 }
 
 /* Alerts */
 .alert {
   padding: 0.75rem 1rem;
   margin-bottom: 1.5rem;
-  border-radius: 0.375rem;
+  border-radius: 0.5rem;
   font-size: 0.9375rem;
   text-align: center;
 }
